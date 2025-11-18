@@ -3,8 +3,8 @@ local Builder = require("yoda-terminal.builder")
 
 describe("terminal.builder", function()
   after_each(function()
-    package.loaded["yoda.terminal.config"] = nil
-    package.loaded["yoda.terminal.shell"] = nil
+    package.loaded["yoda-terminal.config"] = nil
+    package.loaded["yoda-terminal.shell"] = nil
   end)
 
   describe("new()", function()
@@ -208,7 +208,7 @@ describe("terminal.builder", function()
     it("uses provided command", function()
       local captured_cmd = nil
 
-      package.loaded["yoda.terminal.config"] = {
+      package.loaded["yoda-terminal.config"] = {
         make_config = function(cmd, title, opts)
           captured_cmd = cmd
           return {}
@@ -222,14 +222,14 @@ describe("terminal.builder", function()
     it("uses default shell when no command specified", function()
       local captured_cmd = nil
 
-      package.loaded["yoda.terminal.config"] = {
+      package.loaded["yoda-terminal.config"] = {
         make_config = function(cmd, title, opts)
           captured_cmd = cmd
           return {}
         end,
       }
 
-      package.loaded["yoda.terminal.shell"] = {
+      package.loaded["yoda-terminal.shell"] = {
         get_default = function()
           return "/bin/zsh"
         end,
@@ -242,14 +242,14 @@ describe("terminal.builder", function()
     it("passes title to config", function()
       local captured_title = nil
 
-      package.loaded["yoda.terminal.config"] = {
+      package.loaded["yoda-terminal.config"] = {
         make_config = function(cmd, title, opts)
           captured_title = title
           return {}
         end,
       }
 
-      package.loaded["yoda.terminal.shell"] = {
+      package.loaded["yoda-terminal.shell"] = {
         get_default = function()
           return "/bin/sh"
         end,
@@ -262,14 +262,14 @@ describe("terminal.builder", function()
     it("passes all options to config", function()
       local captured_opts = nil
 
-      package.loaded["yoda.terminal.config"] = {
+      package.loaded["yoda-terminal.config"] = {
         make_config = function(cmd, title, opts)
           captured_opts = opts
           return {}
         end,
       }
 
-      package.loaded["yoda.terminal.shell"] = {
+      package.loaded["yoda-terminal.shell"] = {
         get_default = function()
           return "/bin/sh"
         end,
@@ -284,7 +284,7 @@ describe("terminal.builder", function()
     end)
 
     it("supports full fluent chain", function()
-      package.loaded["yoda.terminal.config"] = {
+      package.loaded["yoda-terminal.config"] = {
         make_config = function(cmd, title, opts)
           return { cmd = cmd, title = title }
         end,
