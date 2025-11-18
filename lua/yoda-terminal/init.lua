@@ -20,12 +20,12 @@ local DEFAULT_CONFIG = {
 local function merge_config(user_config)
   user_config = user_config or {}
   local merged = vim.tbl_deep_extend("force", DEFAULT_CONFIG, user_config)
-  
+
   vim.g.yoda_terminal_width = merged.width
   vim.g.yoda_terminal_height = merged.height
   vim.g.yoda_terminal_border = merged.border
   vim.g.yoda_terminal_title_pos = merged.title_pos
-  
+
   return merged
 end
 

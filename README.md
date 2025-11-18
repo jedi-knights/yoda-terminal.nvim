@@ -27,14 +27,21 @@ Auto-detects `.venv`, cross-platform activation (bash/zsh/fish/PowerShell), inte
 {
   "jedi-knights/yoda-terminal.nvim",
   dependencies = {
-    "jedi-knights/yoda.nvim-adapters", -- Required for picker
+    "jedi-knights/yoda.nvim-adapters",
   },
-  config = function()
-    -- Optional: configure defaults
-    require("yoda-terminal").setup({
-      shell = "zsh",  -- or "bash", "fish", "powershell"
-    })
-  end,
+  opts = {
+    width = 0.9,
+    height = 0.85,
+    border = "rounded",
+    title_pos = "center",
+    shell = nil,
+    venv = {
+      auto_detect = true,
+      search_paths = { ".venv", "venv", "env" },
+    },
+    autocmds = true,
+    commands = true,
+  },
 }
 ```
 
@@ -42,23 +49,43 @@ Auto-detects `.venv`, cross-platform activation (bash/zsh/fish/PowerShell), inte
 
 ## 🚀 Quick Start
 
+### Setup
+
+The plugin follows centralized setup rules. Call `setup()` once in your config:
+
+```lua
+require("yoda-terminal").setup({
+  width = 0.9,
+  height = 0.85,
+  border = "rounded",
+  autocmds = true,
+  commands = true,
+})
+```
+
 ### Basic Usage
 
 ```lua
 local terminal = require("yoda-terminal")
 
--- Open floating terminal with auto-detected venv
 terminal.open_floating()
 
--- Open simple terminal with venv
 terminal.open_simple()
 
--- Select venv interactively then open terminal
-terminal.select_virtual_env(function(venv_path)
+terminal.venv.select_virtual_env(function(venv_path)
   print("Selected: " .. venv_path)
   terminal.open_floating({ venv_path = venv_path })
 end)
 ```
+
+### Commands
+
+After setup, the following commands are available:
+
+- `:YodaTerminal` - Open floating terminal
+- `:YodaTerminal floating` - Open floating terminal
+- `:YodaTerminal simple` - Open simple terminal
+- `:YodaTerminalVenv` - Select venv and open terminal
 
 ### Auto-Detection
 
@@ -122,25 +149,33 @@ terminal.open_simple(config)
 
 ```lua
 require("yoda-terminal").setup({
-  -- Shell to use (auto-detected if not specified)
-  shell = nil,  -- "bash", "zsh", "fish", "powershell"
-  
-  -- Virtual environment detection
+  width = 0.9,
+  height = 0.85,
+  border = "rounded",
+  title_pos = "center",
+  shell = nil,
   venv = {
     auto_detect = true,
     search_paths = { ".venv", "venv", "env" },
   },
-  
-  -- Terminal appearance
-  terminal = {
-    title = "Terminal",
-    size = {
-      width = 0.8,
-      height = 0.8,
-    },
-  },
+  autocmds = true,
+  commands = true,
 })
 ```
+
+### Configuration Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `width` | number | 0.9 | Terminal width as percentage of screen |
+| `height` | number | 0.85 | Terminal height as percentage of screen |
+| `border` | string | "rounded" | Border style |
+| `title_pos` | string | "center" | Title position |
+| `shell` | string\|nil | nil | Shell to use (auto-detected if nil) |
+| `venv.auto_detect` | boolean | true | Auto-detect virtual environments |
+| `venv.search_paths` | table | {".venv", "venv", "env"} | Paths to search for venvs |
+| `autocmds` | boolean | true | Enable autocmds |
+| `commands` | boolean | true | Enable user commands |
 
 ### Shell-Specific Activation
 
@@ -200,10 +235,26 @@ end)
 ```
 
 #### `setup(opts)`
-Configure plugin defaults.
+Configure plugin (must be called once before using the plugin).
 
 **Parameters:**
 - `opts` (table|nil): Configuration options
+
+**Example:**
+```lua
+require("yoda-terminal").setup({
+  width = 0.9,
+  height = 0.85,
+  autocmds = true,
+  commands = true,
+})
+```
+
+#### `get_config()`
+Get current configuration.
+
+**Returns:**
+- `table`: Current configuration
 
 ---
 
@@ -298,16 +349,20 @@ yoda-terminal/
 ### Python Development Workflow
 
 ```lua
+require("yoda-terminal").setup({
+  width = 0.9,
+  height = 0.85,
+  commands = true,
+})
+
 local terminal = require("yoda-terminal")
 
--- Quick terminal with venv
 vim.keymap.set("n", "<leader>tt", function()
   terminal.open_floating()
 end, { desc = "Open Python terminal" })
 
--- Select venv before opening
 vim.keymap.set("n", "<leader>tv", function()
-  terminal.select_virtual_env(function(venv)
+  terminal.venv.select_virtual_env(function(venv)
     if venv then
       terminal.open_floating({ venv_path = venv })
     end

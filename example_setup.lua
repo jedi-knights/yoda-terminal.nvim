@@ -58,8 +58,20 @@ function M.lazy_nvim()
       autocmds = true,
     },
     keys = {
-      { "<leader>tt", function() require("yoda-terminal").open_floating() end, desc = "Terminal" },
-      { "<leader>ts", function() require("yoda-terminal").open_simple() end, desc = "Simple terminal" },
+      {
+        "<leader>tt",
+        function()
+          require("yoda-terminal").open_floating()
+        end,
+        desc = "Terminal",
+      },
+      {
+        "<leader>ts",
+        function()
+          require("yoda-terminal").open_simple()
+        end,
+        desc = "Simple terminal",
+      },
       {
         "<leader>tv",
         function()
