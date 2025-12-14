@@ -20,10 +20,12 @@ local SHELL_TYPES = {
 --- @param shell string Shell executable path
 --- @return string|nil Shell type (bash/zsh) or nil for unknown
 function M.get_type(shell)
-  if shell:match(SHELL_TYPES.BASH) then
-    return SHELL_TYPES.BASH
-  elseif shell:match(SHELL_TYPES.ZSH) then
-    return SHELL_TYPES.ZSH
+  if type(shell) == "string" then
+    if shell:match(SHELL_TYPES.BASH) then
+      return SHELL_TYPES.BASH
+    elseif shell:match(SHELL_TYPES.ZSH) then
+      return SHELL_TYPES.ZSH
+    end
   end
   return nil
 end
@@ -52,15 +54,17 @@ function M.open_simple(opts)
     local term_ok, term_err = pcall(snacks.terminal.open, cmd, term_opts)
     if not term_ok then
       local notify = require("yoda-terminal.utils").notify
-      notify("Snacks terminal failed: " .. tostring(term_err), "error")
+      local parts = { "Snacks terminal failed: ", tostring(term_err) }
+      notify(table.concat(parts), "error")
       notify("Falling back to native terminal", "warn")
-      vim.cmd("terminal " .. table.concat(cmd, " "))
+      local cmd_str = table.concat(cmd, " ")
+      vim.cmd("terminal " .. cmd_str)
     end
   else
-    -- Fallback to native terminal
     local notify = require("yoda-terminal.utils").notify
     notify("Using native terminal (snacks not available)", "info")
-    vim.cmd("terminal " .. table.concat(cmd, " "))
+    local cmd_str = table.concat(cmd, " ")
+    vim.cmd("terminal " .. cmd_str)
   end
 end
 

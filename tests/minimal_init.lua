@@ -1,6 +1,9 @@
 -- Minimal init.lua for running tests
 -- This ensures tests run in a clean environment
 
+-- Disable caching for tests
+vim.env.YODA_TEST = "1"
+
 -- Get the root directory
 local root = vim.fn.fnamemodify(vim.fn.getcwd(), ":p")
 
