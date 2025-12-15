@@ -44,7 +44,7 @@ function M.get_activate_script_path(venv_path)
   -- Skip caching in test environment
   local use_cache = not vim.env.YODA_TEST
   local cache_key = use_cache and get_cache_key(venv_path) or nil
-  
+
   if cache_key and _venv_cache[cache_key] ~= nil then
     return _venv_cache[cache_key]
   end

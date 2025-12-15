@@ -119,7 +119,7 @@ setmetatable(M, {
       rawset(t, k, builder)
       return builder
     end
-  end
+  end,
 })
 
 function M.open_floating(opts)

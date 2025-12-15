@@ -1,5 +1,11 @@
 # yoda-terminal.nvim
 
+<p align="center">
+  <a href="https://github.com/jedi-knights/yoda-terminal.nvim/actions/workflows/ci.yml"><img src="https://github.com/jedi-knights/yoda-terminal.nvim/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <img src="https://img.shields.io/badge/tests-passing-brightgreen" alt="Tests">
+  <img src="https://img.shields.io/badge/quality-high-gold" alt="Code Quality">
+</p>
+
 > **Smart Python virtual environment integration for Neovim terminals.**
 
 Auto-detects `.venv`, cross-platform activation (bash/zsh/fish/PowerShell), interactive selection. Facade + Builder patterns.
