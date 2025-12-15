@@ -9,66 +9,70 @@ describe("terminal.venv", function()
   after_each(function()
     vim.fn.getcwd = original_getcwd
     vim.fn.readdir = original_readdir
-    package.loaded["yoda.core.platform"] = nil
-    package.loaded["yoda.core.io"] = nil
-    package.loaded["yoda.adapters.picker"] = nil
-    package.loaded["yoda.utils"] = nil
+    package.loaded["yoda-terminal.utils"] = nil
+    package.loaded["yoda-adapters.picker"] = nil
+    package.loaded["yoda-terminal.venv"] = nil
+    venv._clear_cache()
   end)
 
   describe("get_activate_script_path()", function()
     it("returns Unix activate script path", function()
-      package.loaded["yoda.core.platform"] = {
-        is_windows = function()
-          return false
-        end,
+      package.loaded["yoda-terminal.utils"] = {
+        platform = {
+          is_windows = function()
+            return false
+          end,
+        },
+        io = {
+          is_file = function(path)
+            return path == "/venv/bin/activate"
+          end,
+        },
       }
 
-      package.loaded["yoda.core.io"] = {
-        is_file = function(path)
-          return path == "/venv/bin/activate"
-        end,
-      }
-
-      local path = venv.get_activate_script_path("/venv")
+      package.loaded["yoda-terminal.venv"] = nil
+      local venv_mod = require("yoda-terminal.venv")
+      local path = venv_mod.get_activate_script_path("/venv")
       assert.equals("/venv/bin/activate", path)
     end)
 
     it("returns Windows activate script path", function()
-      -- Need to reload venv module after mocking platform
-      package.loaded["yoda.terminal.venv"] = nil
-
-      package.loaded["yoda.core.platform"] = {
-        is_windows = function()
-          return true
-        end,
+      package.loaded["yoda-terminal.utils"] = {
+        platform = {
+          is_windows = function()
+            return true
+          end,
+        },
+        io = {
+          is_file = function(path)
+            return path == "/venv/Scripts/activate"
+          end,
+        },
       }
 
-      package.loaded["yoda.core.io"] = {
-        is_file = function(path)
-          return path == "/venv/Scripts/activate"
-        end,
-      }
-
-      -- Reload venv with mocked platform
+      package.loaded["yoda-terminal.venv"] = nil
       local venv_mod = require("yoda-terminal.venv")
       local path = venv_mod.get_activate_script_path("/venv")
       assert.equals("/venv/Scripts/activate", path)
     end)
 
     it("returns nil when activate script not found", function()
-      package.loaded["yoda.core.platform"] = {
-        is_windows = function()
-          return false
-        end,
+      package.loaded["yoda-terminal.utils"] = {
+        platform = {
+          is_windows = function()
+            return false
+          end,
+        },
+        io = {
+          is_file = function()
+            return false
+          end,
+        },
       }
 
-      package.loaded["yoda.core.io"] = {
-        is_file = function()
-          return false
-        end,
-      }
-
-      local path = venv.get_activate_script_path("/nonexistent")
+      package.loaded["yoda-terminal.venv"] = nil
+      local venv_mod = require("yoda-terminal.venv")
+      local path = venv_mod.get_activate_script_path("/nonexistent")
       assert.is_nil(path)
     end)
   end)
@@ -83,23 +87,25 @@ describe("terminal.venv", function()
         return { "venv", "env", "node_modules", "src" }
       end
 
-      package.loaded["yoda.core.platform"] = {
-        is_windows = function()
-          return false
-        end,
+      package.loaded["yoda-terminal.utils"] = {
+        platform = {
+          is_windows = function()
+            return false
+          end,
+        },
+        io = {
+          is_dir = function(path)
+            return true
+          end,
+          is_file = function(path)
+            return path == "/project/venv/bin/activate" or path == "/project/env/bin/activate"
+          end,
+        },
       }
 
-      package.loaded["yoda.core.io"] = {
-        is_dir = function(path)
-          return true
-        end,
-        is_file = function(path)
-          -- venv and env have activate scripts
-          return path == "/project/venv/bin/activate" or path == "/project/env/bin/activate"
-        end,
-      }
-
-      local venvs = venv.find_virtual_envs()
+      package.loaded["yoda-terminal.venv"] = nil
+      local venv_mod = require("yoda-terminal.venv")
+      local venvs = venv_mod.find_virtual_envs()
       assert.equals(2, #venvs)
       assert.same({ "/project/venv", "/project/env" }, venvs)
     end)
@@ -113,22 +119,25 @@ describe("terminal.venv", function()
         return { "src", "docs" }
       end
 
-      package.loaded["yoda.core.platform"] = {
-        is_windows = function()
-          return false
-        end,
+      package.loaded["yoda-terminal.utils"] = {
+        platform = {
+          is_windows = function()
+            return false
+          end,
+        },
+        io = {
+          is_dir = function()
+            return true
+          end,
+          is_file = function()
+            return false
+          end,
+        },
       }
 
-      package.loaded["yoda.core.io"] = {
-        is_dir = function()
-          return true
-        end,
-        is_file = function()
-          return false
-        end,
-      }
-
-      local venvs = venv.find_virtual_envs()
+      package.loaded["yoda-terminal.venv"] = nil
+      local venv_mod = require("yoda-terminal.venv")
+      local venvs = venv_mod.find_virtual_envs()
       assert.same({}, venvs)
     end)
 
@@ -141,22 +150,25 @@ describe("terminal.venv", function()
         return {}
       end
 
-      package.loaded["yoda.core.platform"] = {
-        is_windows = function()
-          return false
-        end,
+      package.loaded["yoda-terminal.utils"] = {
+        platform = {
+          is_windows = function()
+            return false
+          end,
+        },
+        io = {
+          is_dir = function()
+            return true
+          end,
+          is_file = function()
+            return false
+          end,
+        },
       }
 
-      package.loaded["yoda.core.io"] = {
-        is_dir = function()
-          return true
-        end,
-        is_file = function()
-          return false
-        end,
-      }
-
-      local venvs = venv.find_virtual_envs()
+      package.loaded["yoda-terminal.venv"] = nil
+      local venv_mod = require("yoda-terminal.venv")
+      local venvs = venv_mod.find_virtual_envs()
       assert.same({}, venvs)
     end)
 
@@ -169,22 +181,25 @@ describe("terminal.venv", function()
         return { "venv", "fake_venv" }
       end
 
-      package.loaded["yoda.core.platform"] = {
-        is_windows = function()
-          return false
-        end,
+      package.loaded["yoda-terminal.utils"] = {
+        platform = {
+          is_windows = function()
+            return false
+          end,
+        },
+        io = {
+          is_dir = function()
+            return true
+          end,
+          is_file = function(path)
+            return path == "/project/venv/bin/activate"
+          end,
+        },
       }
 
-      package.loaded["yoda.core.io"] = {
-        is_dir = function()
-          return true
-        end,
-        is_file = function(path)
-          return path == "/project/venv/bin/activate" -- Only venv has activate
-        end,
-      }
-
-      local venvs = venv.find_virtual_envs()
+      package.loaded["yoda-terminal.venv"] = nil
+      local venv_mod = require("yoda-terminal.venv")
+      local venvs = venv_mod.find_virtual_envs()
       assert.equals(1, #venvs)
       assert.equals("/project/venv", venvs[1])
     end)
@@ -199,27 +214,27 @@ describe("terminal.venv", function()
         return {}
       end
 
-      package.loaded["yoda.core.io"] = {
-        is_dir = function()
-          return true
-        end,
-        is_file = function()
-          return false
-        end,
-      }
-
-      package.loaded["yoda.core.platform"] = {
-        is_windows = function()
-          return false
-        end,
-      }
-
-      package.loaded["yoda.utils"] = {
+      package.loaded["yoda-terminal.utils"] = {
+        platform = {
+          is_windows = function()
+            return false
+          end,
+        },
+        io = {
+          is_dir = function()
+            return true
+          end,
+          is_file = function()
+            return false
+          end,
+        },
         notify = function() end,
       }
 
+      package.loaded["yoda-terminal.venv"] = nil
+      local venv_mod = require("yoda-terminal.venv")
       local callback_result = nil
-      venv.select_virtual_env(function(result)
+      venv_mod.select_virtual_env(function(result)
         callback_result = result
       end)
 
@@ -234,23 +249,27 @@ describe("terminal.venv", function()
         return { "venv" }
       end
 
-      package.loaded["yoda.core.platform"] = {
-        is_windows = function()
-          return false
-        end,
+      package.loaded["yoda-terminal.utils"] = {
+        platform = {
+          is_windows = function()
+            return false
+          end,
+        },
+        io = {
+          is_dir = function()
+            return true
+          end,
+          is_file = function(path)
+            return path == "/project/venv/bin/activate"
+          end,
+        },
+        notify = function() end,
       }
 
-      package.loaded["yoda.core.io"] = {
-        is_dir = function()
-          return true
-        end,
-        is_file = function(path)
-          return path == "/project/venv/bin/activate"
-        end,
-      }
-
+      package.loaded["yoda-terminal.venv"] = nil
+      local venv_mod = require("yoda-terminal.venv")
       local callback_result = nil
-      venv.select_virtual_env(function(result)
+      venv_mod.select_virtual_env(function(result)
         callback_result = result
       end)
 
@@ -265,33 +284,37 @@ describe("terminal.venv", function()
         return { "venv", "env" }
       end
 
-      package.loaded["yoda.core.platform"] = {
-        is_windows = function()
-          return false
-        end,
-      }
-
-      package.loaded["yoda.core.io"] = {
-        is_dir = function()
-          return true
-        end,
-        is_file = function(path)
-          return path:match("/bin/activate$") ~= nil
-        end,
-      }
-
       local picker_called = false
       local captured_items = nil
-      package.loaded["yoda.adapters.picker"] = {
+      package.loaded["yoda-adapters.picker"] = {
         select = function(items, opts, callback)
           picker_called = true
           captured_items = items
-          callback(items[2]) -- Select second
+          callback(items[2])
         end,
       }
 
+      package.loaded["yoda-terminal.utils"] = {
+        platform = {
+          is_windows = function()
+            return false
+          end,
+        },
+        io = {
+          is_dir = function()
+            return true
+          end,
+          is_file = function(path)
+            return path:match("/bin/activate$") ~= nil
+          end,
+        },
+        notify = function() end,
+      }
+
+      package.loaded["yoda-terminal.venv"] = nil
+      local venv_mod = require("yoda-terminal.venv")
       local callback_result = nil
-      venv.select_virtual_env(function(result)
+      venv_mod.select_virtual_env(function(result)
         callback_result = result
       end)
 
@@ -308,23 +331,21 @@ describe("terminal.venv", function()
         return {}
       end
 
-      package.loaded["yoda.core.platform"] = {
-        is_windows = function()
-          return false
-        end,
-      }
-
-      package.loaded["yoda.core.io"] = {
-        is_dir = function()
-          return true
-        end,
-        is_file = function()
-          return false
-        end,
-      }
-
       local notified = false
-      package.loaded["yoda.utils"] = {
+      package.loaded["yoda-terminal.utils"] = {
+        platform = {
+          is_windows = function()
+            return false
+          end,
+        },
+        io = {
+          is_dir = function()
+            return true
+          end,
+          is_file = function()
+            return false
+          end,
+        },
         notify = function(msg, level)
           if msg:match("No Python virtual environments") then
             notified = true
@@ -332,7 +353,9 @@ describe("terminal.venv", function()
         end,
       }
 
-      venv.select_virtual_env(function() end)
+      package.loaded["yoda-terminal.venv"] = nil
+      local venv_mod = require("yoda-terminal.venv")
+      venv_mod.select_virtual_env(function() end)
       assert.is_true(notified)
     end)
 
@@ -344,30 +367,34 @@ describe("terminal.venv", function()
         return { "venv1", "venv2" }
       end
 
-      package.loaded["yoda.core.platform"] = {
-        is_windows = function()
-          return false
-        end,
-      }
-
-      package.loaded["yoda.core.io"] = {
-        is_dir = function()
-          return true
-        end,
-        is_file = function(path)
-          return path:match("/bin/activate$") ~= nil
-        end,
-      }
-
       local captured_opts = nil
-      package.loaded["yoda.adapters.picker"] = {
+      package.loaded["yoda-adapters.picker"] = {
         select = function(items, opts, callback)
           captured_opts = opts
           callback(nil)
         end,
       }
 
-      venv.select_virtual_env(function() end)
+      package.loaded["yoda-terminal.utils"] = {
+        platform = {
+          is_windows = function()
+            return false
+          end,
+        },
+        io = {
+          is_dir = function()
+            return true
+          end,
+          is_file = function(path)
+            return path:match("/bin/activate$") ~= nil
+          end,
+        },
+        notify = function() end,
+      }
+
+      package.loaded["yoda-terminal.venv"] = nil
+      local venv_mod = require("yoda-terminal.venv")
+      venv_mod.select_virtual_env(function() end)
       assert.matches("Python virtual environment", captured_opts.prompt)
     end)
   end)

@@ -12,8 +12,8 @@ describe("terminal.shell", function()
     vim.o.shell = original_shell_opt
     vim.cmd = original_cmd
     package.loaded["snacks"] = nil
-    package.loaded["yoda.utils"] = nil
-    package.loaded["yoda.terminal.config"] = nil
+    package.loaded["yoda-terminal.utils"] = nil
+    package.loaded["yoda-terminal.config"] = nil
   end)
 
   describe("get_type()", function()
@@ -83,7 +83,7 @@ describe("terminal.shell", function()
         },
       }
 
-      package.loaded["yoda.terminal.config"] = {
+      package.loaded["yoda-terminal.config"] = {
         make_win_opts = function(title, overrides)
           return { title = title }
         end,
@@ -111,7 +111,7 @@ describe("terminal.shell", function()
         notify = function() end,
       }
 
-      package.loaded["yoda.terminal.config"] = {
+      package.loaded["yoda-terminal.config"] = {
         make_win_opts = function(title, overrides)
           return { title = title }
         end,
@@ -136,7 +136,7 @@ describe("terminal.shell", function()
         },
       }
 
-      package.loaded["yoda.terminal.config"] = {
+      package.loaded["yoda-terminal.config"] = {
         make_win_opts = function(title, overrides)
           return { title = title }
         end,
@@ -155,7 +155,7 @@ describe("terminal.shell", function()
         },
       }
 
-      package.loaded["yoda.terminal.config"] = {
+      package.loaded["yoda-terminal.config"] = {
         make_win_opts = function(title, overrides)
           captured_title = title
           return { title = title }
@@ -175,7 +175,7 @@ describe("terminal.shell", function()
         },
       }
 
-      package.loaded["yoda.terminal.config"] = {
+      package.loaded["yoda-terminal.config"] = {
         make_win_opts = function(title, overrides)
           captured_title = title
           return { title = title }
@@ -190,7 +190,7 @@ describe("terminal.shell", function()
       package.loaded["snacks"] = nil
 
       local notified = false
-      package.loaded["yoda.utils"] = {
+      package.loaded["yoda-terminal.utils"] = {
         notify = function(msg, level)
           if msg:match("native terminal") then
             notified = true
@@ -198,7 +198,7 @@ describe("terminal.shell", function()
         end,
       }
 
-      package.loaded["yoda.terminal.config"] = {
+      package.loaded["yoda-terminal.config"] = {
         make_win_opts = function(title, overrides)
           return { title = title }
         end,
